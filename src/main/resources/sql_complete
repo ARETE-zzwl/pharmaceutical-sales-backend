@@ -221,3 +221,157 @@ SELECT DATE_FORMAT(stats_date, '%Y-%m') AS month, SUM(sales_amount) AS total_sal
 FROM financial_stats
 WHERE DATE_FORMAT(stats_date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
 GROUP BY month;
+-- 插入药品信息数据
+INSERT INTO drug_info (name, specification, manufacturer, batch_number, expiration_date, unit_price) VALUES
+('DrugA', '500mg', 'ManufacturerA', 'BatchA1', '2025-12-31', 10.00),
+('DrugB', '250mg', 'ManufacturerB', 'BatchB1', '2023-06-30', 15.00),
+('DrugC', '100mg', 'ManufacturerC', 'BatchC1', '2024-09-30', 8.00);
+
+-- 插入员工信息数据
+INSERT INTO employee_info (name, position, contact_info) VALUES
+('EmployeeA', 'PositionA', 'ContactA'),
+('EmployeeB', 'PositionB', 'ContactB'),
+('EmployeeC', 'PositionC', 'ContactC');
+
+-- 插入客户信息数据
+INSERT INTO customer_info (name, contact_info, purchase_history) VALUES
+('CustomerA', 'ContactA', 'PurchaseHistoryA'),
+('CustomerB', 'ContactB', 'PurchaseHistoryB'),
+('CustomerC', 'ContactC', 'PurchaseHistoryC');
+
+-- 插入供应商信息数据
+INSERT INTO supplier_info (name, contact_info, supply_varieties) VALUES
+('SupplierA', 'ContactA', 'VarietiesA'),
+('SupplierB', 'ContactB', 'VarietiesB'),
+('SupplierC', 'ContactC', 'VarietiesC');
+
+-- 插入入库登记数据
+INSERT INTO stock_in (drug_id, quantity, unit_price, supplier_id, stock_in_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugA'), 100, 10.00, (SELECT supplier_id FROM supplier_info WHERE name = 'SupplierA'), '2024-01-15'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugB'), 200, 15.00, (SELECT supplier_id FROM supplier_info WHERE name = 'SupplierB'), '2024-02-20');
+
+-- 插入库存数据
+INSERT INTO inventory (drug_id, quantity, batch_number, expiration_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugA'), 100, 'BatchA1', '2025-12-31'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugB'), 200, 'BatchB1', '2023-06-30');
+
+-- 插入退货处理数据
+INSERT INTO return_handling (drug_id, quantity, reason, return_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugA'), 10, 'Damaged', '2024-03-10'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugB'), 20, 'Expired', '2024-04-15');
+
+-- 插入销售登记数据
+INSERT INTO sales (drug_id, quantity, unit_price, customer_id, sales_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugA'), 50, 12.00, (SELECT customer_id FROM customer_info WHERE name = 'CustomerA'), '2024-05-10'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugB'), 150, 18.00, (SELECT customer_id FROM customer_info WHERE name = 'CustomerB'), '2024-06-20');
+
+-- 插入销售退货数据
+INSERT INTO sales_return (drug_id, quantity, reason, return_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugA'), 5, 'Not needed', '2024-07-10'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugB'), 10, 'Wrong item', '2024-08-15');
+
+-- 插入财务统计数据
+INSERT INTO financial_stats (stats_date, sales_amount, purchase_amount, return_amount) VALUES
+('2024-06-30', 1000.00, 500.00, 100.00),
+('2024-07-31', 1500.00, 750.00, 150.00);
+
+-- 插入数据备份数据
+INSERT INTO data_backup (backup_date, backup_content) VALUES
+('2024-06-01', 'Backup content A'),
+('2024-07-01', 'Backup content B');
+
+-- 插入数据恢复数据
+INSERT INTO data_restore (restore_date, backup_id) VALUES
+('2024-06-05', (SELECT backup_id FROM data_backup WHERE backup_date = '2024-06-01')),
+('2024-07-05', (SELECT backup_id FROM data_backup WHERE backup_date = '2024-07-01'));
+
+-- 插入角色数据
+INSERT INTO roles (role_name) VALUES ('Admin'), ('User'), ('Manager');
+
+-- 插入权限数据
+INSERT INTO permissions (permission_name) VALUES ('READ'), ('WRITE'), ('DELETE');
+
+-- 插入角色权限关联数据
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+((SELECT role_id FROM roles WHERE role_name = 'Admin'), (SELECT permission_id FROM permissions WHERE permission_name = 'READ')),
+((SELECT role_id FROM roles WHERE role_name = 'Admin'), (SELECT permission_id FROM permissions WHERE permission_name = 'WRITE')),
+((SELECT role_id FROM roles WHERE role_name = 'Admin'), (SELECT permission_id FROM permissions WHERE permission_name = 'DELETE')),
+((SELECT role_id FROM roles WHERE role_name = 'User'), (SELECT permission_id FROM permissions WHERE permission_name = 'READ')),
+((SELECT role_id FROM roles WHERE role_name = 'Manager'), (SELECT permission_id FROM permissions WHERE permission_name = 'READ')),
+((SELECT role_id FROM roles WHERE role_name = 'Manager'), (SELECT permission_id FROM permissions WHERE permission_name = 'WRITE'));
+
+-- 插入用户数据
+INSERT INTO users (username, password, role_id) VALUES
+('admin', 'admin_password', (SELECT role_id FROM roles WHERE role_name = 'Admin')),
+('user', 'user_password', (SELECT role_id FROM roles WHERE role_name = 'User')),
+('manager', 'manager_password', (SELECT role_id FROM roles WHERE role_name = 'Manager'));
+-- 插入更多药品信息数据
+INSERT INTO drug_info (name, specification, manufacturer, batch_number, expiration_date, unit_price) VALUES
+('DrugD', '300mg', 'ManufacturerD', 'BatchD1', '2024-11-30', 9.50),
+('DrugE', '400mg', 'ManufacturerE', 'BatchE1', '2025-03-31', 11.00);
+
+-- 插入更多客户信息数据
+INSERT INTO customer_info (name, contact_info, purchase_history) VALUES
+('CustomerD', 'ContactD', 'PurchaseHistoryD'),
+('CustomerE', 'ContactE', 'PurchaseHistoryE');
+
+-- 插入更多供应商信息数据
+INSERT INTO supplier_info (name, contact_info, supply_varieties) VALUES
+('SupplierD', 'ContactD', 'VarietiesD'),
+('SupplierE', 'ContactE', 'VarietiesE');
+
+-- 插入更多入库登记数据
+INSERT INTO stock_in (drug_id, quantity, unit_price, supplier_id, stock_in_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugD'), 150, 9.50, (SELECT supplier_id FROM supplier_info WHERE name = 'SupplierD'), '2024-03-15'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugE'), 180, 11.00, (SELECT supplier_id FROM supplier_info WHERE name = 'SupplierE'), '2024-04-20');
+
+-- 插入更多库存数据
+INSERT INTO inventory (drug_id, quantity, batch_number, expiration_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugD'), 150, 'BatchD1', '2024-11-30'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugE'), 180, 'BatchE1', '2025-03-31');
+
+-- 插入更多退货处理数据
+INSERT INTO return_handling (drug_id, quantity, reason, return_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugD'), 15, 'Damaged packaging', '2024-05-10'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugE'), 18, 'Quality issues', '2024-06-15');
+
+-- 插入更多销售登记数据
+INSERT INTO sales (drug_id, quantity, unit_price, customer_id, sales_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugD'), 75, 10.50, (SELECT customer_id FROM customer_info WHERE name = 'CustomerD'), '2024-07-10'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugE'), 90, 12.00, (SELECT customer_id FROM customer_info WHERE name = 'CustomerE'), '2024-08-20');
+
+-- 插入更多销售退货数据
+INSERT INTO sales_return (drug_id, quantity, reason, return_date) VALUES
+((SELECT drug_id FROM drug_info WHERE name = 'DrugD'), 7, 'Incorrect dosage', '2024-09-10'),
+((SELECT drug_id FROM drug_info WHERE name = 'DrugE'), 9, 'Customer complaint', '2024-10-15');
+
+-- 插入更多财务统计数据
+INSERT INTO financial_stats (stats_date, sales_amount, purchase_amount, return_amount) VALUES
+('2024-08-31', 2000.00, 1000.00, 200.00),
+('2024-09-30', 2500.00, 1250.00, 250.00);
+
+-- 插入更多数据备份数据
+INSERT INTO data_backup (backup_date, backup_content) VALUES
+('2024-08-01', 'Backup content C'),
+('2024-09-01', 'Backup content D');
+
+-- 插入更多数据恢复数据
+INSERT INTO data_restore (restore_date, backup_id) VALUES
+('2024-08-05', (SELECT backup_id FROM data_backup WHERE backup_date = '2024-08-01')),
+('2024-09-05', (SELECT backup_id FROM data_backup WHERE backup_date = '2024-09-01'));
+
+-- 插入更多角色数据
+INSERT INTO roles (role_name) VALUES ('Auditor'), ('Viewer');
+
+-- 插入更多权限数据
+INSERT INTO permissions (permission_name) VALUES ('VIEW_REPORTS'), ('EXPORT_DATA');
+
+-- 插入更多角色权限关联数据
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+((SELECT role_id FROM roles WHERE role_name = 'Auditor'), (SELECT permission_id FROM permissions WHERE permission_name = 'VIEW_REPORTS')),
+((SELECT role_id FROM roles WHERE role_name = 'Viewer'), (SELECT permission_id FROM permissions WHERE permission_name = 'EXPORT_DATA'));
+
+-- 插入更多用户数据
+INSERT INTO users (username, password, role_id) VALUES
+('auditor', 'auditor_password', (SELECT role_id FROM roles WHERE role_name = 'Auditor')),
+('viewer', 'viewer_password', (SELECT role_id FROM roles WHERE role_name = 'Viewer'));
