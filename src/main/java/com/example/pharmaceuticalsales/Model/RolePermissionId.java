@@ -1,10 +1,13 @@
 package com.example.pharmaceuticalsales.Model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@Data
 public class RolePermissionId implements Serializable {
 
     private Long roleId;
@@ -22,21 +25,6 @@ public class RolePermissionId implements Serializable {
 
     // Getters and Setters, equals() and hashCode()
 
-    public Long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
-
-    public Long getPermissionId() {
-        return permissionId;
-    }
-
-    public void setPermissionId(Long permissionId) {
-        this.permissionId = permissionId;
-    }
 
     @Override
     public boolean equals(Object o) {
