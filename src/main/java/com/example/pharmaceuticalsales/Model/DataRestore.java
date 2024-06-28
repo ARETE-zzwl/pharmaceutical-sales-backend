@@ -1,9 +1,12 @@
 package com.example.pharmaceuticalsales.Model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.util.Date;
 
 @Entity
+@Data
 @Table(name = "data_restore")
 public class DataRestore {
 
@@ -25,43 +28,4 @@ public class DataRestore {
 
     // Getters and Setters
 
-    public Long getRestoreId() {
-        return restoreId;
-    }
-
-    public void setRestoreId(Long restoreId) {
-        this.restoreId = restoreId;
-    }
-
-    public Date getRestoreDate() {
-        return restoreDate;
-    }
-
-    public void setRestoreDate(Date restoreDate) {
-        this.restoreDate = restoreDate;
-    }
-
-    public DataBackup getDataBackup() {
-        return dataBackup;
-    }
-
-    public void setDataBackup(DataBackup dataBackup) {
-        this.dataBackup = dataBackup;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }
