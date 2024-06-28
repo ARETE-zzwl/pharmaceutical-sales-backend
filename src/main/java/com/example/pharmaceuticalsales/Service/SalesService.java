@@ -36,6 +36,9 @@ public class SalesService {
         existingSales.setSalesDate(sales.getSalesDate());
         return salesRepository.save(existingSales);
     }
+    public Sales getSaleById(Long id) {
+        return salesRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sale not found"));
+    }
 
     public void deleteSales(Long id) {
         salesRepository.deleteById(id);

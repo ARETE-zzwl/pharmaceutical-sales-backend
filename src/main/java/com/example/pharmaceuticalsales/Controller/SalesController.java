@@ -40,4 +40,9 @@ public class SalesController {
         salesService.deleteSales(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<Sales> getSaleById(@PathVariable Long id) {
+        Sales sales = salesService.getSaleById(id);
+        return ResponseEntity.ok(sales);
+    }
 }
