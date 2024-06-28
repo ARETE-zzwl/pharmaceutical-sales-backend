@@ -1,0 +1,222 @@
+-- 创建数据库
+CREATE DATABASE medical_sales_management;
+USE medical_sales_management;
+
+-- 创建药品信息表
+CREATE TABLE drug_info (
+    drug_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    specification VARCHAR(255),
+    manufacturer VARCHAR(255),
+    batch_number VARCHAR(50),
+    expiration_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建员工信息表
+CREATE TABLE employee_info (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    position VARCHAR(255),
+    contact_info VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建客户信息表
+CREATE TABLE customer_info (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    contact_info VARCHAR(255),
+    purchase_history TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建供应商信息表
+CREATE TABLE supplier_info (
+    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    contact_info VARCHAR(255),
+    supply_varieties TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建入库登记表
+CREATE TABLE stock_in (
+    stock_in_id INT AUTO_INCREMENT PRIMARY KEY,
+    drug_id INT,
+    quantity INT,
+    unit_price DECIMAL(10, 2),
+    supplier_id INT,
+    stock_in_date DATE,
+    FOREIGN KEY (drug_id) REFERENCES drug_info(drug_id),
+    FOREIGN KEY (supplier_id) REFERENCES supplier_info(supplier_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建库存表
+CREATE TABLE inventory (
+    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
+    drug_id INT,
+    quantity INT,
+    batch_number VARCHAR(50),
+    expiration_date DATE,
+    FOREIGN KEY (drug_id) REFERENCES drug_info(drug_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建退货处理表
+CREATE TABLE return_handling (
+    return_id INT AUTO_INCREMENT PRIMARY KEY,
+    drug_id INT,
+    quantity INT,
+    reason TEXT,
+    return_date DATE,
+    FOREIGN KEY (drug_id) REFERENCES drug_info(drug_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建销售登记表
+CREATE TABLE sales (
+    sales_id INT AUTO_INCREMENT PRIMARY KEY,
+    drug_id INT,
+    quantity INT,
+    unit_price DECIMAL(10, 2),
+    customer_id INT,
+    sales_date DATE,
+    FOREIGN KEY (drug_id) REFERENCES drug_info(drug_id),
+    FOREIGN KEY (customer_id) REFERENCES customer_info(customer_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建销售退货表
+CREATE TABLE sales_return (
+    return_id INT AUTO_INCREMENT PRIMARY KEY,
+    drug_id INT,
+    quantity INT,
+    reason TEXT,
+    return_date DATE,
+    FOREIGN KEY (drug_id) REFERENCES drug_info(drug_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建财务统计表
+CREATE TABLE financial_stats (
+    stats_id INT AUTO_INCREMENT PRIMARY KEY,
+    stats_date DATE,
+    sales_amount DECIMAL(10, 2),
+    purchase_amount DECIMAL(10, 2),
+    return_amount DECIMAL(10, 2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建数据备份表
+CREATE TABLE data_backup (
+    backup_id INT AUTO_INCREMENT PRIMARY KEY,
+    backup_date DATE,
+    backup_content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建数据恢复表
+CREATE TABLE data_restore (
+    restore_id INT AUTO_INCREMENT PRIMARY KEY,
+    restore_date DATE,
+    backup_id INT,
+    FOREIGN KEY (backup_id) REFERENCES data_backup(backup_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建用户表
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+);
+
+-- 创建角色表
+CREATE TABLE roles (
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建权限表
+CREATE TABLE permissions (
+    permission_id INT AUTO_INCREMENT PRIMARY KEY,
+    permission_name VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 创建角色权限关联表
+CREATE TABLE role_permissions (
+    role_id INT,
+    permission_id INT,
+    PRIMARY KEY (role_id, permission_id),
+    FOREIGN KEY (role_id) REFERENCES roles(role_id),
+    FOREIGN KEY (permission_id) REFERENCES permissions(permission_id)
+);
+
+-- 创建入库登记查询视图
+CREATE VIEW stock_in_view AS
+SELECT si.stock_in_id, di.name AS drug_name, si.quantity, si.unit_price, si.stock_in_date, si.supplier_id, si.created_at, si.updated_at
+FROM stock_in si
+JOIN drug_info di ON si.drug_id = di.drug_id;
+
+-- 创建入库报表视图
+CREATE VIEW stock_in_report_view AS
+SELECT si.stock_in_date, di.name AS drug_name, SUM(si.quantity) AS total_quantity, SUM(si.quantity * si.unit_price) AS total_cost
+FROM stock_in si
+JOIN drug_info di ON si.drug_id = di.drug_id
+GROUP BY si.stock_in_date, di.name;
+
+-- 创建库存查询视图
+CREATE VIEW inventory_view AS
+SELECT i.inventory_id, di.name AS drug_name, i.quantity, i.batch_number, i.expiration_date, i.created_at, i.updated_at
+FROM inventory i
+JOIN drug_info di ON i.drug_id = di.drug_id;
+
+-- 创建库存报表视图
+CREATE VIEW inventory_report_view AS
+SELECT di.name AS drug_name, SUM(i.quantity) AS total_quantity
+FROM inventory i
+JOIN drug_info di ON i.drug_id = di.drug_id
+GROUP BY di.name;
+
+-- 创建销售报表视图
+CREATE VIEW sales_report_view AS
+SELECT s.sales_date, di.name AS drug_name, SUM(s.quantity) AS total_quantity, SUM(s.quantity * s.unit_price) AS total_sales
+FROM sales s
+JOIN drug_info di ON s.drug_id = di.drug_id
+GROUP BY s.sales_date, di.name;
+
+-- 创建每日财务统计视图
+CREATE VIEW daily_financial_view AS
+SELECT stats_date, SUM(sales_amount) AS total_sales, SUM(purchase_amount) AS total_purchases, SUM(return_amount) AS total_returns
+FROM financial_stats
+WHERE stats_date = CURDATE()
+GROUP BY stats_date;
+
+-- 创建每月财务统计视图
+CREATE VIEW monthly_financial_view AS
+SELECT DATE_FORMAT(stats_date, '%Y-%m') AS month, SUM(sales_amount) AS total_sales, SUM(purchase_amount) AS total_purchases, SUM(return_amount) AS total_returns
+FROM financial_stats
+WHERE DATE_FORMAT(stats_date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+GROUP BY month;
