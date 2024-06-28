@@ -1,9 +1,12 @@
 package com.example.pharmaceuticalsales.Model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.util.Date;
 
 @Entity
+@Data
 @Table(name = "financial_stats")
 public class FinancialStats {
 
@@ -24,59 +27,4 @@ public class FinancialStats {
 
     // Getters and Setters
 
-    public Long getStatsId() {
-        return statsId;
-    }
-
-    public void setStatsId(Long statsId) {
-        this.statsId = statsId;
-    }
-
-    public Date getStatsDate() {
-        return statsDate;
-    }
-
-    public void setStatsDate(Date statsDate) {
-        this.statsDate = statsDate;
-    }
-
-    public double getSalesAmount() {
-        return salesAmount;
-    }
-
-    public void setSalesAmount(double salesAmount) {
-        this.salesAmount = salesAmount;
-    }
-
-    public double getPurchaseAmount() {
-        return purchaseAmount;
-    }
-
-    public void setPurchaseAmount(double purchaseAmount) {
-        this.purchaseAmount = purchaseAmount;
-    }
-
-    public double getReturnAmount() {
-        return returnAmount;
-    }
-
-    public void setReturnAmount(double returnAmount) {
-        this.returnAmount = returnAmount;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }
