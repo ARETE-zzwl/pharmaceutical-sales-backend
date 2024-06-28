@@ -1,0 +1,24 @@
+-- 确保 drug_info 表具有 unitPrice 字段
+CREATE TABLE IF NOT EXISTS drug_info (
+    drug_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    specification VARCHAR(255),
+    manufacturer VARCHAR(255),
+    batch_number VARCHAR(50),
+    expiration_date DATE,
+    unit_price DECIMAL(10, 2), -- 添加 unitPrice 字段
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 确保 sales_return 表结构正确
+CREATE TABLE IF NOT EXISTS sales_return (
+    return_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    drug_id BIGINT,
+    quantity INT,
+    reason TEXT,
+    return_date DATE,
+    FOREIGN KEY (drug_id) REFERENCES drug_info(drug_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

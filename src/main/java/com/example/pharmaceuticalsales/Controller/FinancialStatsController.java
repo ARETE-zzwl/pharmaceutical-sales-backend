@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -26,6 +27,11 @@ public class FinancialStatsController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy) {
         return ResponseEntity.ok(financialStatsService.getAllFinancialStats(page, size, sortBy));
+    }
+
+    @GetMapping("/byDate")
+    public ResponseEntity<List<FinancialStats>> getFinancialStatsByDate(@RequestParam Date statsDate) {
+        return ResponseEntity.ok(financialStatsService.getFinancialStatsByDate(statsDate));
     }
 
     @PostMapping

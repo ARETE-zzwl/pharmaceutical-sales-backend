@@ -2,8 +2,11 @@ package com.example.pharmaceuticalsales.Repository;
 
 import com.example.pharmaceuticalsales.Model.FinancialStats;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import java.util.Date;
+import java.util.List;
+
 public interface FinancialStatsRepository extends JpaRepository<FinancialStats, Long> {
+    List<FinancialStats> findByStatsDate(Date statsDate);
+
 }

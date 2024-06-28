@@ -21,6 +21,7 @@ public class Drug {
     private String manufacturer;
     private String batchNumber;
     private Date expirationDate;
+    private double unitPrice;
 
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;
