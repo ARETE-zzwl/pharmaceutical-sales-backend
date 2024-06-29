@@ -1,6 +1,8 @@
 package com.example.pharmaceuticalsales.Controller;
 
 import com.example.pharmaceuticalsales.Model.FinancialStats;
+import com.example.pharmaceuticalsales.Model.MonthlyStats;
+import com.example.pharmaceuticalsales.Model.YearlyStats;
 import com.example.pharmaceuticalsales.Service.FinancialStatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,5 +53,14 @@ public class FinancialStatsController {
     public ResponseEntity<Void> deleteFinancialStats(@PathVariable Long id) {
         financialStatsService.deleteFinancialStats(id);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/monthlyStats")
+    public ResponseEntity<List<MonthlyStats>> getMonthlyStatsByYear(@RequestParam int year) {
+        return ResponseEntity.ok(financialStatsService.getMonthlyStatsByYear(year));
+    }
+
+    @GetMapping("/yearlyStats")
+    public ResponseEntity<List<YearlyStats>> getYearlyStatsByYear(@RequestParam int year) {
+        return ResponseEntity.ok(financialStatsService.getYearlyStatsByYear(year));
     }
 }

@@ -2,6 +2,8 @@ package com.example.pharmaceuticalsales.Service;
 
 import com.example.pharmaceuticalsales.Exception.ResourceNotFoundException;
 import com.example.pharmaceuticalsales.Model.FinancialStats;
+import com.example.pharmaceuticalsales.Model.MonthlyStats;
+import com.example.pharmaceuticalsales.Model.YearlyStats;
 import com.example.pharmaceuticalsales.Repository.FinancialStatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,11 +23,18 @@ public class FinancialStatsService {
     private final FinancialStatsRepository financialStatsRepository;
     private static final Logger LOGGER = Logger.getLogger(FinancialStatsService.class.getName());
 
+
     @Autowired
     public FinancialStatsService(FinancialStatsRepository financialStatsRepository) {
         this.financialStatsRepository = financialStatsRepository;
     }
+    public List<MonthlyStats> getMonthlyStatsByYear(int year) {
+        return financialStatsRepository.findMonthlyStatsByYear(year);
+    }
 
+    public List<YearlyStats> getYearlyStatsByYear(int year) {
+        return financialStatsRepository.findYearlyStatsByYear(year);
+    }
     public Page<FinancialStats> getAllFinancialStats(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         return financialStatsRepository.findAll(pageable);
