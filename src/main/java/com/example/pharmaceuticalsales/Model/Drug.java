@@ -30,5 +30,4 @@ public class Drug {
     private Date updatedAt;
 
     // Getters and Setters
-
 }
