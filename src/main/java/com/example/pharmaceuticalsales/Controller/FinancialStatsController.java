@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 import java.util.List;
 
@@ -30,7 +32,8 @@ public class FinancialStatsController {
     }
 
     @GetMapping("/byDate")
-    public ResponseEntity<List<FinancialStats>> getFinancialStatsByDate(@RequestParam Date statsDate) {
+    public ResponseEntity<List<FinancialStats>> getFinancialStatsByDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date statsDate) {
         return ResponseEntity.ok(financialStatsService.getFinancialStatsByDate(statsDate));
     }
 

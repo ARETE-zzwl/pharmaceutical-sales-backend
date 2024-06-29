@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface FinancialStatsRepository extends JpaRepository<FinancialStats, Long> {
     List<FinancialStats> findByStatsDate(Date statsDate);
-
+    List<FinancialStats> findByStatsDateBetween(Date startDate, Date endDate);
 }
