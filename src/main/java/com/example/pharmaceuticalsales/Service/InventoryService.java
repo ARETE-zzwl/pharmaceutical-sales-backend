@@ -161,12 +161,12 @@ public class InventoryService {
 
         double forecast = forecastOutput.getDouble(forecastOutput.length() - 1);
 
-        Optional<Inventory> optionalInventory = inventoryRepository.findByDrugDrugId(drugId);
-        if (!optionalInventory.isPresent()) {
-            throw new IllegalArgumentException("Inventory not found for drug ID " + drugId);
+        List<Inventory> inventories = inventoryRepository.findAllByDrugDrugId(drugId);
+        if (inventories.size() != 1) {
+            throw new IllegalArgumentException("Expected exactly one inventory record for drug ID " + drugId + ", but found " + inventories.size());
         }
 
-        Inventory inventory = optionalInventory.get();
+        Inventory inventory = inventories.get(0);
         return inventory.getQuantity() - forecast;
     }
 }
