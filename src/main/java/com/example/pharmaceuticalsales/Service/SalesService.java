@@ -5,6 +5,8 @@ import com.example.pharmaceuticalsales.Exception.ResourceNotFoundException;
 import com.example.pharmaceuticalsales.Model.Sales;
 import com.example.pharmaceuticalsales.Repository.SalesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,5 +44,8 @@ public class SalesService {
 
     public void deleteSales(Long id) {
         salesRepository.deleteById(id);
+    }
+    public Page<Sales> getAllSales(Pageable pageable) {
+        return salesRepository.findAll(pageable);
     }
 }

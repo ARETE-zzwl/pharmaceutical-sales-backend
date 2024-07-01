@@ -4,6 +4,8 @@ package com.example.pharmaceuticalsales.Controller;
 import com.example.pharmaceuticalsales.Model.Sales;
 import com.example.pharmaceuticalsales.Service.SalesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +24,8 @@ public class SalesController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Sales>> getAllSales() {
-        return ResponseEntity.ok(salesService.getAllSales());
+    public ResponseEntity<Page<Sales>> getAllSales(Pageable pageable) {
+        return ResponseEntity.ok(salesService.getAllSales(pageable));
     }
 
     @PostMapping
@@ -41,9 +43,11 @@ public class SalesController {
         salesService.deleteSales(id);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<Sales> getSaleById(@PathVariable Long id) {
         Sales sales = salesService.getSaleById(id);
         return ResponseEntity.ok(sales);
     }
 }
+
