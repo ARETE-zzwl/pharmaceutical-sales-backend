@@ -24,6 +24,8 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,7 +43,9 @@ public class InventoryService {
         this.inventoryRepository = inventoryRepository;
         this.salesRepository = salesRepository;
     }
-
+    public Page<Inventory> getAllInventories(Pageable pageable) {
+        return inventoryRepository.findAll(pageable);
+    }
     public List<Inventory> getAllInventories() {
         return inventoryRepository.findAll();
     }

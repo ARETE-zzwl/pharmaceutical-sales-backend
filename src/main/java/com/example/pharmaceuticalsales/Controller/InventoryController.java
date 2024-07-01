@@ -4,12 +4,13 @@ package com.example.pharmaceuticalsales.Controller;
 import com.example.pharmaceuticalsales.Model.Inventory;
 import com.example.pharmaceuticalsales.Service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/inventories")
 public class InventoryController {
@@ -22,8 +23,8 @@ public class InventoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Inventory>> getAllInventories() {
-        return ResponseEntity.ok(inventoryService.getAllInventories());
+    public ResponseEntity<Page<Inventory>> getAllInventories(Pageable pageable) {
+        return ResponseEntity.ok(inventoryService.getAllInventories(pageable));
     }
 
     @GetMapping("/{id}")
