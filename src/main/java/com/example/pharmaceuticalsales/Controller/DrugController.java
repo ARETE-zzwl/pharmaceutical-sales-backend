@@ -1,15 +1,16 @@
 package com.example.pharmaceuticalsales.Controller;
 
+
 import com.example.pharmaceuticalsales.Model.Drug;
 import com.example.pharmaceuticalsales.Service.DrugService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/drugs")
 public class DrugController {
@@ -22,18 +23,16 @@ public class DrugController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Drug>> getAllDrugs() {
-        return ResponseEntity.ok(drugService.getAllDrugs());
+    public ResponseEntity<Page<Drug>> getAllDrugs(Pageable pageable) {
+        return ResponseEntity.ok(drugService.getAllDrugs(pageable));
     }
-
+    @GetMapping("/{id}")
+    public ResponseEntity<Drug> getDrugById(@PathVariable Long id) {
+        return ResponseEntity.ok(drugService.getDrugById(id));
+    }
     @PostMapping
     public ResponseEntity<Drug> createDrug(@RequestBody Drug drug) {
         return ResponseEntity.ok(drugService.saveDrug(drug));
-    }
-
-    @PostMapping("/batch")
-    public ResponseEntity<List<Drug>> createDrugs(@RequestBody List<Drug> drugs) {
-        return ResponseEntity.ok(drugService.saveDrugs(drugs));
     }
 
     @PutMapping("/{id}")
@@ -60,5 +59,10 @@ public class DrugController {
     @GetMapping("/manufacturer/{manufacturer}")
     public ResponseEntity<List<Drug>> getDrugsByManufacturer(@PathVariable String manufacturer) {
         return ResponseEntity.ok(drugService.getDrugsByManufacturer(manufacturer));
+    }
+
+    @GetMapping("/expired")
+    public ResponseEntity<Page<Drug>> getExpiredDrugs(Pageable pageable) {
+        return ResponseEntity.ok(drugService.getExpiredDrugs(pageable));
     }
 }

@@ -1,11 +1,13 @@
 package com.example.pharmaceuticalsales.Service;
 
-import com.example.pharmaceuticalsales.Exception.ResourceNotFoundException;
+
 import com.example.pharmaceuticalsales.Model.Drug;
 import com.example.pharmaceuticalsales.Repository.DrugRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import com.example.pharmaceuticalsales.Exception.ResourceNotFoundException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -19,9 +21,11 @@ public class DrugService {
     public DrugService(DrugRepository drugRepository) {
         this.drugRepository = drugRepository;
     }
-
-    public List<Drug> getAllDrugs() {
-        return drugRepository.findAll();
+    public Drug getDrugById(Long id) {
+        return drugRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Drug not found"));
+    }
+    public Page<Drug> getAllDrugs(Pageable pageable) {
+        return drugRepository.findAll(pageable);
     }
 
     public Drug saveDrug(Drug drug) {
@@ -62,5 +66,10 @@ public class DrugService {
 
     public List<Drug> getDrugsByManufacturer(String manufacturer) {
         return drugRepository.findByManufacturer(manufacturer);
+    }
+
+    public Page<Drug> getExpiredDrugs(Pageable pageable) {
+        Date currentDate = new Date();
+        return drugRepository.findByExpirationDateBefore(currentDate, pageable);
     }
 }
