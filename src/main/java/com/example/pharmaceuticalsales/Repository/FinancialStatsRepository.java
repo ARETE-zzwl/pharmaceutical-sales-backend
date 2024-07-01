@@ -1,8 +1,11 @@
 package com.example.pharmaceuticalsales.Repository;
 
+
 import com.example.pharmaceuticalsales.Model.FinancialStats;
 import com.example.pharmaceuticalsales.Model.MonthlyStats;
 import com.example.pharmaceuticalsales.Model.YearlyStats;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,6 +15,7 @@ import java.util.List;
 public interface FinancialStatsRepository extends JpaRepository<FinancialStats, Long> {
     List<FinancialStats> findByStatsDate(Date statsDate);
     List<FinancialStats> findByStatsDateBetween(Date startDate, Date endDate);
+
     @Query("SELECT new com.example.pharmaceuticalsales.Model.MonthlyStats(" +
             "YEAR(f.statsDate), MONTH(f.statsDate), SUM(f.salesAmount), SUM(f.purchaseAmount), SUM(f.returnAmount)) " +
             "FROM FinancialStats f " +
@@ -25,4 +29,7 @@ public interface FinancialStatsRepository extends JpaRepository<FinancialStats, 
             "WHERE YEAR(f.statsDate) = :year " +
             "GROUP BY YEAR(f.statsDate)")
     List<YearlyStats> findYearlyStatsByYear(int year);
+
+    @Query("SELECT f FROM FinancialStats f WHERE f.statsDate = :statsDate")
+    Page<FinancialStats> findByStatsDate(Date statsDate, Pageable pageable);
 }

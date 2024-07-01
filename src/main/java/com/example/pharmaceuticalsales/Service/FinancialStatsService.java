@@ -1,5 +1,6 @@
 package com.example.pharmaceuticalsales.Service;
 
+
 import com.example.pharmaceuticalsales.Exception.ResourceNotFoundException;
 import com.example.pharmaceuticalsales.Model.FinancialStats;
 import com.example.pharmaceuticalsales.Model.MonthlyStats;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -23,11 +23,11 @@ public class FinancialStatsService {
     private final FinancialStatsRepository financialStatsRepository;
     private static final Logger LOGGER = Logger.getLogger(FinancialStatsService.class.getName());
 
-
     @Autowired
     public FinancialStatsService(FinancialStatsRepository financialStatsRepository) {
         this.financialStatsRepository = financialStatsRepository;
     }
+
     public List<MonthlyStats> getMonthlyStatsByYear(int year) {
         return financialStatsRepository.findMonthlyStatsByYear(year);
     }
@@ -35,6 +35,7 @@ public class FinancialStatsService {
     public List<YearlyStats> getYearlyStatsByYear(int year) {
         return financialStatsRepository.findYearlyStatsByYear(year);
     }
+
     public Page<FinancialStats> getAllFinancialStats(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         return financialStatsRepository.findAll(pageable);
@@ -63,22 +64,9 @@ public class FinancialStatsService {
         financialStatsRepository.deleteById(id);
     }
 
-    public List<FinancialStats> getFinancialStatsByDate(Date statsDate) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(statsDate);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date startDate = calendar.getTime();
-
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 999);
-        Date endDate = calendar.getTime();
-
-        return financialStatsRepository.findByStatsDateBetween(startDate, endDate);
+    public Page<FinancialStats> getFinancialStatsByDate(Date statsDate, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return financialStatsRepository.findByStatsDate(statsDate, pageable);
     }
 
     private void validateFinancialStats(FinancialStats financialStats) {
@@ -89,5 +77,9 @@ public class FinancialStatsService {
             throw new IllegalArgumentException("Stats date cannot be null");
         }
     }
-}
 
+
+    public List<FinancialStats> getFinancialStatsByMonth(Date startDate, Date endDate) {
+        return financialStatsRepository.findByStatsDateBetween(startDate, endDate);
+    }
+}

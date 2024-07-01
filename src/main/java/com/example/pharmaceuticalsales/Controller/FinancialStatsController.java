@@ -14,6 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 import java.util.List;
 
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/financialstats")
@@ -35,9 +36,11 @@ public class FinancialStatsController {
     }
 
     @GetMapping("/byDate")
-    public ResponseEntity<List<FinancialStats>> getFinancialStatsByDate(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date statsDate) {
-        return ResponseEntity.ok(financialStatsService.getFinancialStatsByDate(statsDate));
+    public ResponseEntity<Page<FinancialStats>> getFinancialStatsByDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date statsDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(financialStatsService.getFinancialStatsByDate(statsDate, page, size));
     }
 
     @PostMapping
@@ -55,6 +58,7 @@ public class FinancialStatsController {
         financialStatsService.deleteFinancialStats(id);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/monthlyStats")
     public ResponseEntity<List<MonthlyStats>> getMonthlyStatsByYear(@RequestParam int year) {
         return ResponseEntity.ok(financialStatsService.getMonthlyStatsByYear(year));
@@ -63,5 +67,12 @@ public class FinancialStatsController {
     @GetMapping("/yearlyStats")
     public ResponseEntity<List<YearlyStats>> getYearlyStatsByYear(@RequestParam int year) {
         return ResponseEntity.ok(financialStatsService.getYearlyStatsByYear(year));
+    }
+
+    @GetMapping("/byMonth")
+    public ResponseEntity<List<FinancialStats>> getFinancialStatsByMonth(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        return ResponseEntity.ok(financialStatsService.getFinancialStatsByMonth(startDate, endDate));
     }
 }
