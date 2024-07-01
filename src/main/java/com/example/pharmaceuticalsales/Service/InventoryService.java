@@ -1,6 +1,5 @@
 package com.example.pharmaceuticalsales.Service;
 
-
 import com.example.pharmaceuticalsales.Exception.ResourceNotFoundException;
 import com.example.pharmaceuticalsales.Model.Inventory;
 import com.example.pharmaceuticalsales.Model.Sales;
@@ -29,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InventoryService {
@@ -43,9 +43,11 @@ public class InventoryService {
         this.inventoryRepository = inventoryRepository;
         this.salesRepository = salesRepository;
     }
+
     public Page<Inventory> getAllInventories(Pageable pageable) {
         return inventoryRepository.findAll(pageable);
     }
+
     public List<Inventory> getAllInventories() {
         return inventoryRepository.findAll();
     }
@@ -159,11 +161,12 @@ public class InventoryService {
 
         double forecast = forecastOutput.getDouble(forecastOutput.length() - 1);
 
-        Inventory inventory = inventoryRepository.findByDrugDrugId(drugId);
-        if (inventory == null) {
+        Optional<Inventory> optionalInventory = inventoryRepository.findByDrugDrugId(drugId);
+        if (!optionalInventory.isPresent()) {
             throw new IllegalArgumentException("Inventory not found for drug ID " + drugId);
         }
 
+        Inventory inventory = optionalInventory.get();
         return inventory.getQuantity() - forecast;
     }
 }
