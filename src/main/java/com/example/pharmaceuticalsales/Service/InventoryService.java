@@ -21,6 +21,8 @@ import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,8 @@ import java.util.List;
 
 @Service
 public class InventoryService {
+
+    private static final Logger log = LoggerFactory.getLogger(InventoryService.class);
 
     private final InventoryRepository inventoryRepository;
     private final SalesRepository salesRepository;
@@ -92,6 +96,12 @@ public class InventoryService {
         double[] quantities = sales.stream().mapToDouble(Sales::getQuantity).toArray();
         int trainSize = quantities.length - days;
 
+        if (trainSize <= 0) {
+            throw new IllegalArgumentException("Not enough data to train the model. Ensure that the number of days to predict is less than the total number of data points.");
+        }
+
+        log.debug("Training size: {}", trainSize);
+
         // Prepare the input data with the correct shape [miniBatchSize, nIn, timeSeriesLength]
         INDArray input = Nd4j.create(new int[]{1, 1, trainSize});
         INDArray output = Nd4j.create(new int[]{1, 1, trainSize});
@@ -108,7 +118,6 @@ public class InventoryService {
         trainDataIterator.setPreProcessor(normalizer);
 
         int lstmLayerSize = 50;
-        int tbpttLength = 10;
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
