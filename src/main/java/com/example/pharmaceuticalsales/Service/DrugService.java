@@ -39,6 +39,7 @@ public class DrugService {
         existingDrug.setManufacturer(drug.getManufacturer());
         existingDrug.setBatchNumber(drug.getBatchNumber());
         existingDrug.setExpirationDate(drug.getExpirationDate());
+        existingDrug.setUnitPrice(drug.getUnitPrice());
         return drugRepository.save(existingDrug);
     }
 
