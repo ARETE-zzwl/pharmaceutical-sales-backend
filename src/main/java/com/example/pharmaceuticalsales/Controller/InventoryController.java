@@ -25,6 +25,11 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.getAllInventories());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {
+        return ResponseEntity.ok(inventoryService.getInventoryById(id));
+    }
+
     @PostMapping
     public ResponseEntity<Inventory> createInventory(@RequestBody Inventory inventory) {
         return ResponseEntity.ok(inventoryService.saveInventory(inventory));
@@ -39,5 +44,20 @@ public class InventoryController {
     public ResponseEntity<Void> deleteInventory(@PathVariable Long id) {
         inventoryService.deleteInventory(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/add")
+    public ResponseEntity<Inventory> addStock(@PathVariable Long id, @RequestParam int quantity) {
+        return ResponseEntity.ok(inventoryService.addStock(id, quantity));
+    }
+
+    @PutMapping("/{id}/reduce")
+    public ResponseEntity<Inventory> reduceStock(@PathVariable Long id, @RequestParam int quantity) {
+        return ResponseEntity.ok(inventoryService.reduceStock(id, quantity));
+    }
+
+    @GetMapping("/{id}/predict")
+    public ResponseEntity<Double> predictStock(@PathVariable Long id, @RequestParam int days) {
+        return ResponseEntity.ok(inventoryService.predictStock(id, days));
     }
 }
