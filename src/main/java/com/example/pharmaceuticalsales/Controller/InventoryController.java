@@ -1,6 +1,7 @@
 package com.example.pharmaceuticalsales.Controller;
 
 
+import com.example.pharmaceuticalsales.Model.Drug;
 import com.example.pharmaceuticalsales.Model.Inventory;
 import com.example.pharmaceuticalsales.Service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +62,13 @@ public class InventoryController {
     @GetMapping("/{id}/predict")
     public ResponseEntity<Double> predictStock(@PathVariable Long id, @RequestParam int days) {
         return ResponseEntity.ok(inventoryService.predictStock(id, days));
+    }
+    @GetMapping("/expiring-soon")
+    public ResponseEntity<List<Drug>> getDrugsExpiringSoon() {
+        return ResponseEntity.ok(inventoryService.getDrugsinventoryExpiringSoon());
+    }
+    @GetMapping("/expired")
+    public ResponseEntity<Page<Drug>> getExpiredDrugs(Pageable pageable) {
+        return ResponseEntity.ok(inventoryService.getExpiredDrugs(pageable));
     }
 }

@@ -1,6 +1,7 @@
 package com.example.pharmaceuticalsales.Service;
 
 import com.example.pharmaceuticalsales.Exception.ResourceNotFoundException;
+import com.example.pharmaceuticalsales.Model.Drug;
 import com.example.pharmaceuticalsales.Model.Inventory;
 import com.example.pharmaceuticalsales.Model.Sales;
 import com.example.pharmaceuticalsales.Repository.InventoryRepository;
@@ -27,6 +28,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -107,62 +110,79 @@ public class InventoryService {
 
         log.debug("Training size: {}", trainSize);
 
-        // Prepare the input data with the correct shape [miniBatchSize, nIn, timeSeriesLength]
-        INDArray input = Nd4j.create(new int[]{1, 1, trainSize});
-        INDArray output = Nd4j.create(new int[]{1, 1, trainSize});
+
+        INDArray input = Nd4j.create(new int[]{1, 1, trainSize});//表示输入的样本数目
+        INDArray output = Nd4j.create(new int[]{1, 1, trainSize});//表示输出的样本数目
 
         for (int i = 0; i < trainSize; i++) {
-            input.putScalar(new int[]{0, 0, i}, quantities[i]);
-            output.putScalar(new int[]{0, 0, i}, quantities[i + 1]);
+            input.putScalar(new int[]{0, 0, i}, quantities[i]);//输入
+            output.putScalar(new int[]{0, 0, i}, quantities[i + 1]);//输出
         }
 
-        DataSet trainData = new DataSet(input, output);
-        DataSetIterator trainDataIterator = new org.deeplearning4j.datasets.iterator.impl.SingletonDataSetIterator(trainData);
-        NormalizerStandardize normalizer = new NormalizerStandardize();
-        normalizer.fit(trainDataIterator);
-        trainDataIterator.setPreProcessor(normalizer);
+        DataSet trainData = new DataSet(input, output);//训练数据集
+        DataSetIterator trainDataIterator = new org.deeplearning4j.datasets.iterator.impl.SingletonDataSetIterator(trainData);//训练数据集迭代器
+        NormalizerStandardize normalizer = new NormalizerStandardize();//数据标准化
+        normalizer.fit(trainDataIterator);//标准化
+        trainDataIterator.setPreProcessor(normalizer);//数据标准化
 
-        int lstmLayerSize = 50;
+        int lstmLayerSize = 50;//LSTM层的神经元个数
 
-        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .updater(new Adam(0.001))
-                .list()
-                .layer(0, new LSTM.Builder()
-                        .nIn(1)
-                        .nOut(lstmLayerSize)
-                        .activation(Activation.TANH)
-                        .build())
-                .layer(1, new RnnOutputLayer.Builder(LossFunctions.LossFunction.MSE)
-                        .activation(Activation.IDENTITY)
-                        .nIn(lstmLayerSize)
-                        .nOut(1)
-                        .build())
-                .build();
+        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()//神经网络配置
+                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)//优化算法
+                .updater(new Adam(0.001))//学习率
+                .list()//神经网络结构
+                .layer(0, new LSTM.Builder()//LSTM层
+                        .nIn(1)//输入神经元个数
+                        .nOut(lstmLayerSize)//输出神经元个数
+                        .activation(Activation.TANH)//激活函数
+                        .build())//LSTM层
+                .layer(1, new RnnOutputLayer.Builder(LossFunctions.LossFunction.MSE)//输出层
+                        .activation(Activation.IDENTITY)//激活函数
+                        .nIn(lstmLayerSize)//输入神经元个数
+                        .nOut(1)//输出神经元个数
+                        .build())//输出层
+                .build();//神经网络配置
 
-        MultiLayerNetwork net = new MultiLayerNetwork(conf);
-        net.init();
-        net.setListeners(new ScoreIterationListener(20));
+        MultiLayerNetwork net = new MultiLayerNetwork(conf);//神经网络
+        net.init();//初始化神经网络
+        net.setListeners(new ScoreIterationListener(20));//训练过程监听器
 
-        for (int i = 0; i < 100; i++) {
-            trainDataIterator.reset();
-            net.fit(trainDataIterator);
+        for (int i = 0; i < 100; i++) {//训练100次
+            trainDataIterator.reset();//数据集迭代器重置
+            net.fit(trainDataIterator);//训练模型
         }
 
-        // Prepare the forecast input data
-        INDArray forecastInput = Nd4j.create(new int[]{1, 1, days});
-        for (int i = 0; i < days; i++) {
-            forecastInput.putScalar(new int[]{0, 0, i}, quantities[quantities.length - days + i]);
+        // 预测
+        INDArray forecastInput = Nd4j.create(new int[]{1, 1, days});//表示输入的样本数目
+        for (int i = 0; i < days; i++) {//输入预测数据
+            forecastInput.putScalar(new int[]{0, 0, i}, quantities[quantities.length - days + i]);//输入
         }
 
-        INDArray forecastOutput = net.rnnTimeStep(forecastInput);
-        normalizer.revertLabels(forecastOutput);
+        INDArray forecastOutput = net.rnnTimeStep(forecastInput);//预测输出
+        normalizer.revertLabels(forecastOutput);//数据反标准化
 
-        double forecast = forecastOutput.getDouble(forecastOutput.length() - 1);
+        double forecast = forecastOutput.getDouble(forecastOutput.length() - 1);//预测结果
 
-        List<Inventory> inventories = inventoryRepository.findAllByDrugDrugId(drugId);
-        int totalQuantity = inventories.stream().mapToInt(Inventory::getQuantity).sum();
+        List<Inventory> inventories = inventoryRepository.findAllByDrugDrugId(drugId);//库存数据
+        int totalQuantity = inventories.stream().mapToInt(Inventory::getQuantity).sum();//总库存量
 
-        return totalQuantity - forecast;
+        return totalQuantity - forecast;//库存量预测值
+    }
+
+    public List<Drug> getDrugsinventoryExpiringSoon() {
+
+        Date currentDate = new Date();//表示当前时间
+        Calendar cal = Calendar.getInstance();//得到日历实例
+        cal.setTime(currentDate);//设置当前时间
+        cal.add(Calendar.MONTH, 1); // 得到下个月
+        Date nextMonth = cal.getTime();//得到下个月时间
+        return inventoryRepository.findByExpirationDateBetween(currentDate, nextMonth);//得到即将过期的药品
+        }
+
+    public Page<Drug> getExpiredDrugs(Pageable pageable) {
+        Date currentDate = new Date();
+        return inventoryRepository.findByExpirationDateBefore(currentDate, pageable);
     }
 }
+
+

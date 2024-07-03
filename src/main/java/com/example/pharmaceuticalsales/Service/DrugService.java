@@ -56,12 +56,12 @@ public class DrugService {
     }
 
     public List<Drug> getDrugsExpiringSoon() {
-        Date currentDate = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(currentDate);
-        cal.add(Calendar.MONTH, 1); // 假设即将过期的定义是一个月内
-        Date nextMonth = cal.getTime();
-        return drugRepository.findByExpirationDateBetween(currentDate, nextMonth);
+        Date currentDate = new Date();//表示当前时间
+        Calendar cal = Calendar.getInstance();//得到日历实例
+        cal.setTime(currentDate);//设置当前时间
+        cal.add(Calendar.MONTH, 1); // 得到下个月
+        Date nextMonth = cal.getTime();//得到下个月时间
+        return drugRepository.findByExpirationDateBetween(currentDate, nextMonth);//得到即将过期的药品
     }
 
     public List<Drug> getDrugsByManufacturer(String manufacturer) {
