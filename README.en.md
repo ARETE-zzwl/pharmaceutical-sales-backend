@@ -1,23 +1,24 @@
 # Pharmaceutical Sales Backend
 
-Spring Boot backend for a pharmaceutical sales and inventory management system.
+[中文 / bilingual README](README.md)
 
-## Features
+The Spring Boot backend for a pharmaceutical sales and inventory system. It provides authentication, roles and permissions, drug and inventory records, customers and suppliers, sales, returns and financial statistics.
 
-- User registration, login, JWT authentication, roles and permissions
-- Customer, employee, supplier, drug and inventory management
-- Sales, returns, stock-in records and financial statistics
-- MySQL persistence with JPA/Hibernate
+Persistence uses MySQL and Spring Data JPA. Authentication uses Spring Security and JWT. The companion frontend is [pharmaceutical-sales-frontend](https://github.com/ARETE-zzwl/pharmaceutical-sales-frontend).
 
-## Requirements
+### Requirements
 
-- JDK 8 or newer
-- MySQL 8 or a compatible MySQL server
-- Gradle Wrapper included in the repository
+Use JDK 17 and MySQL 8. The Gradle Wrapper is included. The current project uses Spring Boot 3.3.1 and a Java 17 toolchain; the previous Java 8 requirement was incorrect.
 
-## Configuration
+### Database and configuration
 
-The repository contains public-safe configuration placeholders only. Set these environment variables before starting the service:
+Create the local database:
+
+```sql
+CREATE DATABASE medical_sales_management;
+```
+
+Set these environment variables before starting, replacing the example password and secret:
 
 ```text
 DB_URL=jdbc:mysql://localhost:3306/medical_sales_management?useSSL=false&serverTimezone=UTC
@@ -28,9 +29,11 @@ JWT_EXPIRATION=3600000
 SERVER_PORT=8080
 ```
 
-See [`application-example.properties`](src/main/resources/application-example.properties). Never commit database passwords or JWT secrets.
+[application.properties](src/main/resources/application.properties) reads these variables. `DB_PASSWORD` and `JWT_SECRET` have no defaults and must be set. See [application-example.properties](src/main/resources/application-example.properties) for reference. Keep actual credentials out of version control.
 
-## Run Locally
+The current `ddl-auto=update` setting updates the schema at startup. Files under `src/main/resources/sql_complete` and `sql_mod/` contain schema, sample data and historical changes. Review them as needed; they are not automatically applied as versioned migrations.
+
+### Run locally
 
 ```bash
 git clone https://github.com/ARETE-zzwl/pharmaceutical-sales-backend.git
@@ -38,12 +41,14 @@ cd pharmaceutical-sales-backend
 ./gradlew bootRun
 ```
 
-On Windows, use `gradlew.bat bootRun`. The service listens on `http://localhost:8080` by default.
+On Windows, run `.gradlew.bat bootRun`. The default address is `http://localhost:8080`. The development frontend runs on 8081 and proxies `/api` to this service.
 
-## API Areas
+### API and source layout
 
-The REST API provides `/api` resources for customers, drugs, employees, inventories, permissions, roles, sales, returns, stock-in records, suppliers and users. Authentication endpoints are provided by `AuthController`.
+Authentication endpoints are `/api/auth/login` and `/api/auth/register`. Business controllers cover customers, drugs, employees, inventories, permissions, roles, sales, returns, stock-in records and suppliers.
+
+Under `src/main/java/com/example/pharmaceuticalsales/`, `Controller/` contains HTTP endpoints, `Service/` business logic, `Repository/` JPA data access, and `Model/` entities. Security and JWT code live in `config/` and `Util/`. Read [SecurityConfig.java](src/main/java/com/example/pharmaceuticalsales/config/SecurityConfig.java) for the actual access rules.
 
 ## License
 
-Licensed under the Mulan Permissive Software License, Version 2 (Mulan PSL v2). See [`LICENSE`](LICENSE).
+[Mulan PSL v2](LICENSE).
